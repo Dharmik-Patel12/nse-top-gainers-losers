@@ -88,8 +88,8 @@ def scrape_nse_data():
               print(f"An error occurred: {e}")
     
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    os.makedirs("nse_Top_20_Gainers_Losers", exist_ok=True)
-    filename = f"nse_Top_20_Gainers_Losers/nse_Top_20_Gainers_Losers_{timestamp}.json"
+    os.makedirs("top-gainers-losers", exist_ok=True)
+    filename = f"top-gainers-losers/top-gainers-losers-{timestamp}.json"
     if len(all_data) >0:
         
         with open(filename, "w", encoding="utf-8") as f:
@@ -107,3 +107,23 @@ def scrape_nse_data():
 if __name__ == "__main__":
     scrape_nse_data()
     # app.run(host="0.0.0.0", port=8080)
+
+
+# from flask import Flask
+# import threading
+
+# app = Flask(__name__)
+
+# def scrape_job():
+#     # Your scraping code here
+#     print("Scraping started...")
+#     # do scraping
+#     print("Scraping finished!")
+
+# @app.route('/run-scrape')
+# def run_scrape():
+#     threading.Thread(target=scrape_job).start()
+#     return "Scrape job started!"
+
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=8080)
