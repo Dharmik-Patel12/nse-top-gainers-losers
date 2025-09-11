@@ -103,7 +103,7 @@ def scrape_nse_data():
 #     # Run scraping in a separate thread to avoid timeout on Replit
 #     threading.Thread(target=scrape_nse_data).start()
 #     return "Scraper started!"
-
+print('Check')
 if __name__ == "__main__":
     scrape_nse_data()
     # app.run(host="0.0.0.0", port=8080)
