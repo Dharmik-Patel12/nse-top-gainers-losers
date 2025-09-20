@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
 import time
 import datetime
+from datetime import datetime
 import requests
 import json
 import os
