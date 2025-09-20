@@ -138,9 +138,10 @@ def scrape_nse_data():
 @app.route('/run-scrape')
 def run_scraper():
     # Run scraping in a separate thread to avoid timeout on Replit
-    # threading.Thread(target=scrape_nse_data).start()
-    scrape_nse_data()
+    threading.Thread(target=scrape_nse_data).start()
+    # scrape_nse_data()
     return "Scraper started!"
+    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
