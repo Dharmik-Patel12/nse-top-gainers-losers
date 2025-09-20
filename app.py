@@ -72,9 +72,9 @@ def upload_json(data):
     print(result)
     print(filename)
     print("upload Done")
-    return jsonify({
+    return {
         "uploaded": True
-    })
+    }
 
 def scrape_nse_data():
     print("Starting scrape job...")
