@@ -23,6 +23,9 @@ import threading
 
 app = Flask(__name__)
 load_dotenv()
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 cloudinary.config(
     cloud_name=os.getenv("cloud_name"),
