@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nse-selenium-scraper
+    env: python
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y firefox
+      pip install -r requirements.txt
+    startCommand: python app.py  # or your app entrypoint
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
