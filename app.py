@@ -34,7 +34,7 @@ def get_cookies():
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
     options.add_argument("--remote-debugging-port=9222")
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Firefox(options=options)
     driver.get("https://www.nseindia.com/market-data/top-gainers-losers")
 
     time.sleep(5)  # Wait for the page and cookies to load
