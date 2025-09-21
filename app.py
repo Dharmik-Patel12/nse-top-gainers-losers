@@ -1,6 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+import logging
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.common.exceptions import WebDriverException
 from dotenv import load_dotenv
 import time
 import datetime
@@ -24,29 +30,82 @@ cloudinary.config(
     api_secret=os.getenv("api_secret")
 )
 
-def get_cookies():
-    options = Options()
-    # options.add_argument("headless")  # run in headless mode if you want
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
-    options.add_argument("--headless")  # Headless mode
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--remote-debugging-port=9222")
-    driver = webdriver.Firefox(options=options)
-    driver.get("https://www.nseindia.com/market-data/top-gainers-losers")
+# def get_cookies():
+#     options = Options()
+#     # options.add_argument("headless")  # run in headless mode if you want
+#     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+#     options.add_argument("--headless")  # Headless mode
+#     options.add_argument("--no-sandbox")
+#     options.add_argument("--disable-dev-shm-usage")
+#     options.add_argument("--disable-gpu")
+#     options.add_argument("--disable-extensions")
+#     options.add_argument("--remote-debugging-port=9222")
+#     driver = webdriver.Firefox(options=options)
+#     driver.get("https://www.nseindia.com/market-data/top-gainers-losers")
 
-    time.sleep(5)  # Wait for the page and cookies to load
+#     time.sleep(5)  # Wait for the page and cookies to load
 
-    # Extract cookies from Selenium
-    selenium_cookies = driver.get_cookies()
-    # print(selenium_cookies)
-    driver.quit()
+#     # Extract cookies from Selenium
+#     selenium_cookies = driver.get_cookies()
+#     # print(selenium_cookies)
+#     driver.quit()
 
-    # Convert cookies to requests format
-    cookies = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
-    return cookies
+#     # Convert cookies to requests format
+#     cookies = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
+#     return cookies
+
+
+def get_cookies(max_retries=5, wait_time=3):
+    attempt = 0
+    cookies = None
+
+    while attempt < max_retries:
+        attempt += 1
+        logger.info(f"🔁 Attempt {attempt} to get cookies...")
+
+        # Set up Firefox options
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.set_preference("general.useragent.override",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        )
+
+        try:
+            driver = webdriver.Firefox(
+                service=Service(GeckoDriverManager().install()),
+                options=options
+            )
+
+            driver.get("https://www.nseindia.com/market-data/top-gainers-losers")
+
+            # Wait for the cookies to load
+            time.sleep(wait_time)
+
+            selenium_cookies = driver.get_cookies()
+            driver.quit()
+
+            if selenium_cookies:
+                cookies = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
+                logger.info(f"✅ Cookies retrieved on attempt {attempt}")
+                return cookies
+            else:
+                logger.warning(f"⚠️ No cookies found on attempt {attempt}, retrying...")
+
+        except WebDriverException as e:
+            logger.error(f"❌ WebDriver error: {e}")
+            time.sleep(wait_time)
+
+        finally:
+            try:
+                driver.quit()
+            except:
+                pass
+
+    logger.error("❌ Failed to get cookies after max retries.")
+    return {}
     
 
 def upload_json(data):
